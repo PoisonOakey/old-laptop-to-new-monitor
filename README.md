@@ -24,7 +24,7 @@ To drive a 4K monitor, a DisplayLink adapter is required to bypass the motherboa
 A true graphics driver purge requires isolating the OS and altering boot states. To contain the blast radius across system restarts, the execution is segregated into three distinct phases:
 
 ```text
-📁 DisplayLink-Automated-Remediation/
+📁 scripts/
 ├── 📄 01-Isolate-And-BootSafe.ps1  # Prepares environment & forces Safe Mode
 ├── 📄 02-Purge-Drivers.ps1         # Silently executes DDU dual-GPU wipe
 └── 📄 03-Deploy-DisplayLink.ps1    # Restores network & installs clean DisplayLink UI/Drivers
