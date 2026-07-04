@@ -5,6 +5,7 @@
     Re-enables network adapters and deploys DisplayLink drivers via Winget.
 #>
 
+# 1. Force all silent errors to instantly trigger the Catch block
 $ErrorActionPreference = 'Stop'
 
 $DDUFolder = "C:\DDU"
