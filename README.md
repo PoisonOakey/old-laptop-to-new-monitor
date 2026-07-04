@@ -1,58 +1,61 @@
-# DisplayLink Automated Remediation
+# DisplayLink Automated Remediation Pipeline
 
-A 3-phase PowerShell pipeline that clean-installs DisplayLink drivers on older laptops to enable 4K external monitor output. Handles Safe Mode cycling, dual-GPU driver purging (via DDU), and automated DisplayLink deployment — all with transcript logging and fail-safe error handling.
+A modular PowerShell automation suite designed to resolve degraded video output, pixelation, and bandwidth throttling when bypassing physical GPU bottlenecks via DisplayLink hardware.
 
-## Prerequisites
+## 🌱 The Hardware Bottleneck
+* **Laptop:** MSI GF63C Thin (Intel Core i5, NVIDIA GTX 1650 Max-Q)
+* **Monitor:** Xiaomi 4K 60Hz Monitor A27Ui
+* **Adapter:** Vention USB to Dual HDMI MST Adapter (DisplayLink)
 
-- **OS**: Windows 10 / 11
-- **Shell**: PowerShell 5.1+
-- **Privileges**: Run as Administrator (all 3 scripts require elevation)
-- **Tools**: [Winget](https://learn.microsoft.com/en-us/windows/package-manager/winget/) (pre-installed on Windows 11; install via MS Store on Windows 10)
-- **Network**: Active internet connection (Phase 1 disables adapters; Phase 3 re-enables them)
+## 💦 Problem Statement
+The MSI GF63 Thin's USB-C port is data-only. It lacks physical video traces to the GPU:
 
-## How It Works
+```text
+[Intel iGPU] ──(Direct Traces)──> [HDMI 1.4 Port] ──> [Monitor]
+[Intel iGPU] ──(Direct Traces)──> [USB-C Port] ✖ [Signal Terminated]
+```
 
-The pipeline runs across **two reboots** in three sequential phases:
+To drive a 4K monitor, a DisplayLink adapter is required to bypass the motherboard and route compressed video data over standard USB protocols. When legacy display drivers corrupt this USB pipeline, it causes severe macroblocking and pixelation. This suite automates the deep-level OS remediation required to restore a clean 5Gbps video stream.
 
-| Phase | Script | What It Does |
-|-------|--------|-------------|
-| 1 | `01-Isolate-And-BootSafe.ps1` | Downloads DDU, disables network adapters, reboots into Safe Mode |
-| 2 | `02-Purge-Drivers.ps1` | Silently purges NVIDIA + Intel GPU drivers via DDU, exits Safe Mode, reboots |
-| 3 | `03-Deploy-DisplayLink.ps1` | Re-enables network, installs DisplayLink Core Driver + Manager via Winget |
+<img width="1024" height="559" alt="articwimds" src="https://github.com/user-attachments/assets/34bf3727-9313-45cb-8734-f1db923f9dca" />
 
-> **Note**: Each phase must be run manually after the preceding reboot. They are not daisy-chained automatically because Safe Mode restricts script execution.
 
-## Usage
+## ⚙️ Pipeline Architecture
+A true graphics driver purge requires isolating the OS and altering boot states. To contain the blast radius across system restarts, the execution is segregated into three distinct phases:
 
-Run each script **as Administrator** in order, rebooting between phases:
+```text
+📁 DisplayLink-Automated-Remediation/
+├── 📄 01-Isolate-And-BootSafe.ps1  # Prepares environment & forces Safe Mode
+├── 📄 02-Purge-Drivers.ps1         # Silently executes DDU dual-GPU wipe
+└── 📄 03-Deploy-DisplayLink.ps1    # Restores network & installs clean DisplayLink UI/Drivers
+```
 
+## 🚀 Execution Instructions
+
+**Prerequisites:** Disconnect your DisplayLink adapter before beginning. Ensure you are running an elevated PowerShell terminal (`Run as Administrator`).
+
+### Step 1: Isolate & Reboot
+Downloads uninstaller payloads, disables physical network adapters to block Windows Update hijacking, and automatically reboots into Safe Mode.
 ```powershell
-# Phase 1 — Run in normal Windows, triggers Safe Mode reboot
-powershell.exe -ExecutionPolicy Bypass -File ".\scripts\01-Isolate-And-BootSafe.ps1"
-
-# Phase 2 — Run after booting into Safe Mode
-powershell.exe -ExecutionPolicy Bypass -File ".\scripts\02-Purge-Drivers.ps1"
-
-# Phase 3 — Run after rebooting back to normal Windows
-powershell.exe -ExecutionPolicy Bypass -File ".\scripts\03-Deploy-DisplayLink.ps1"
+Set-ExecutionPolicy Bypass -Scope Process -Force
+.\01-Isolate-And-BootSafe.ps1
 ```
 
-## Safety Features
-
-- **Transcript logging**: Every phase writes a timestamped log to `C:\DDU\`
-- **Safe Mode boot loop prevention**: Phase 2 removes the Safe Mode flag in both the `try` and `catch` blocks, so a DDU crash won't strand the user
-- **Network failsafe**: Phase 1 re-enables adapters if it fails after disabling them
-- **Admin check**: All scripts abort immediately if not running elevated
-
-## Logs
-
-Transcript logs are written to:
-
+### Step 2: The Purge
+*(Run after logging into Safe Mode)*. Silently wipes corrupted Intel/NVIDIA drivers and reboots back to standard Windows.
+```powershell
+Set-ExecutionPolicy Bypass -Scope Process -Force
+.\02-Purge-Drivers.ps1
 ```
-C:\DDU\Phase1_Log_<timestamp>.txt
-C:\DDU\Phase2_Log.txt
-C:\DDU\Phase3_Log.txt
+
+### Step 3: Deploy & Reconnect
+*(Run after returning to normal Windows)*. Restores internet connectivity and pulls clean DisplayLink drivers via Winget.
+```powershell
+Set-ExecutionPolicy Bypass -Scope Process -Force
+.\03-Deploy-DisplayLink.ps1
 ```
+
+*Once Step 3 completes, plug the DisplayLink adapter back into the laptop.*
 
 ## License
 
