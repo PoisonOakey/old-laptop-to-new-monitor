@@ -13,6 +13,7 @@ $DDUFolder = "C:\DDU"
 $LogPath = "$DDUFolder\Phase2_Log.txt"
 Start-Transcript -Path $LogPath -Append -Force
 
+# 2. The "Try" Block: Execute the dangerous code
 try {
     if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
         throw "Elevated PowerShell terminal required (Run as Administrator)."
