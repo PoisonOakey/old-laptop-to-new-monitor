@@ -38,6 +38,7 @@ catch {
     Write-Information "Error Details: $($_.Exception.Message)"
     Write-Information "[!] Manual intervention required for package deployment."
 }
+# 4. The "Finally" Block: This runs no matter what happens
 finally {
     Write-Information "[+] Stopping transcript log..."
     Stop-Transcript
