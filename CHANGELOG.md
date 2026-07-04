@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/).
 
-## [2.0.0] - 2026-07-05
+## [1.0.0] - 2026-07-05
 
 ### Changed
 - Replaced all `Write-Host` calls with `Write-Information` (PSScriptAnalyzer compliance)
@@ -21,7 +21,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/).
 - `README.md` with full documentation
 - `CHANGELOG.md`
 
-## [1.0.0] - 2026-07-04
+## [0.1.0] - 2026-07-04
 
 ### Added
 - Initial 3-phase remediation pipeline
