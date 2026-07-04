@@ -39,7 +39,6 @@ try {
     Start-Sleep -Seconds 3
     Restart-Computer
 }
-
 # 3. The "Catch" Block: If ANYTHING fails above, execution instantly jumps here
 catch {
     Write-Information "`n[X] CRITICAL PIPELINE FAILURE"
@@ -48,8 +47,7 @@ catch {
     # Failsafe: If DDU crashes, remove the safeboot flag anyway so the user isn't stuck forever.
     bcdedit /deletevalue "{current}" safeboot | Out-Null
 }
-
-
+# 4. The "Finally" Block: This runs no matter what happens
 finally {
     Write-Information "[+] Stopping transcript log..."
     Stop-Transcript
