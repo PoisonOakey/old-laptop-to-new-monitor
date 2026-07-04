@@ -3,7 +3,7 @@
 A modular PowerShell automation suite designed to resolve degraded video output, pixelation, and bandwidth throttling when bypassing physical GPU bottlenecks via DisplayLink hardware.
 
 ## 🌱 The Hardware Bottleneck
-* **Laptop:** MSI GF63 Thin (Intel Core i5, NVIDIA GTX 1650 Max-Q)
+* **Laptop:** MSI GF63C Thin (Intel Core i5, NVIDIA GTX 1650 Max-Q)
 * **Monitor:** Xiaomi 4K 60Hz Monitor A27Ui
 * **Adapter:** Vention USB to Dual HDMI MST Adapter (DisplayLink)
 
