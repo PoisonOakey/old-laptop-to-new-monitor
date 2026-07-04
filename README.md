@@ -1,91 +1,56 @@
-# Older Laptop, Newer Monitor
+# DisplayLink Automated Remediation Pipeline
 
-## :seedling: Setup
-1. MSI GF63 Thin 2021 Edition (Intel I5, Nvidia Gtx 1650 Max Q)
-2. Xiaomi 4K 60Hz Monito A27Ui
-3. Vention USB to Dual HDMI MST Adpater
+A modular PowerShell automation suite designed to resolve degraded video output, pixelation, and bandwidth throttling when bypassing physical GPU bottlenecks via DisplayLink hardware.
 
-## :sweat_drops: Problem Statement
-Due to the old HDMI 1.4 and data-only USB-C port, the laptop needs a dedicate DisplayLink adapter to drive the external monitor with optimized color fidelity & resolution. 
+## 🌱 The Hardware Bottleneck (Setup)
+* **Laptop:** MSI GF63 Thin 2021 Edition (Intel Core i5, NVIDIA GTX 1650 Max-Q)
+* **Monitor:** Xiaomi 4K 60Hz Monitor A27Ui
+* **Adapter:** Vention USB to Dual HDMI MST Adapter (DisplayLink)
 
-Normally, the GPU connects directly to physical video traces on the motherboard that lead straight to a video output. But since MSI GF63 Thin's USB-C port is wired solely for USB data protocol pins, the native video signal physically can't reach the port. 
-> [!NOTE]
-> On the GF63 Thin, the HDMI port is routed through the Intel integrated graphics (iGPU), not the NVIDIA GTX 1650.
+## 💦 Problem Statement
+Due to the legacy HDMI 1.4 port and a data-only USB-C port, this architecture requires a dedicated DisplayLink adapter to drive the external 4K monitor with optimized color fidelity and resolution. 
 
-```
+On the MSI GF63 Thin, the physical video traces do not route to the USB-C port:
+
+```text
 [Intel iGPU] ──(Direct Hardware Traces)──> [HDMI Port] ──> [Monitor]
 [Intel iGPU] ──(Direct Hardware Traces)──> [USB-C Port (Data Only)] ✖ [Signal Terminated]
 ```
 
-DisplayLink adapter however, ignored the physical video traces entirely. It uses the CPU to compress the display data into standard network/ USB packets, and send it across the data pins of the USB-C port. Then, the GPU chip inside the adapter will do the heavy lifting of rebuilding the video signal.
+**The Solution:** The DisplayLink adapter bypasses the physical motherboard traces entirely. It utilizes the CPU to compress display data into standard USB packets, routes them through the data-only USB-C port, and relies on a dedicated Synaptics decoder chip inside the adapter to rebuild the video signal. 
 
-<img width="512" height="280" alt="image" src="https://github.com/user-attachments/assets/f74cdc9b-d23d-47c7-9ae9-de65c5ea3ebb" />
+When corrupted legacy display profiles force incorrect scaling or limit color depth over this USB pipeline, the result is heavy macroblocking and pixelation. This script suite completely automates the deep-level remediation of those corrupted profiles.
 
-<br>
-<br>
+## ⚙️ Pipeline Architecture
+Because a true graphics driver purge requires isolating the OS and altering boot states, this automation is segregated into three blast-radius-contained phases:
 
-## :sunny: Troubleshooting Steps
-### Step #1: Clean Driver Wipe
-Corrupted display profiles often force incorrect scaling or limited color depth, resulting in a pixelated image. A clean installation resets the baseline output.
+1. **`01-Isolate-And-BootSafe.ps1`**: Fetches payloads, severs physical network adapters to block generic Windows Update driver injection, and configures the BCD for a Safe Mode reboot.
+2. **`02-Purge-Drivers.ps1`**: Executes silently within Safe Mode, purging both NVIDIA and Intel architectures via DDU, and restores the standard boot flag.
+3. **`03-Deploy-DisplayLink.ps1`**: Re-establishes network links and sequentially deploys the DisplayLink core drivers and the MS Store Manager app via Winget.
 
-1. Download Display Driver Uninstaller (DDU). 
+## 🚀 Execution Instructions
+
+**Prerequisites:** Disconnect your DisplayLink adapter before beginning. Ensure you are running an elevated PowerShell terminal (`Run as Administrator`).
+
+### Step 1: Isolate & Reboot
+Run the first script. The system will download the required uninstaller, disable your Wi-Fi, and automatically reboot your machine into Safe Mode.
+```powershell
+Set-ExecutionPolicy Bypass -Scope Process -Force
+.\01-Isolate-And-BootSafe.ps1
 ```
-# 1. Create the target directory and navigate into it
-mkdir C:\DDU
-cd C:\DDU
 
-# 2. Curl the payload directly from the developer's server
-# Note: This points to v18.0.7.4. If it 404s, they pushed an update, and you just swap the version numbers.
-curl.exe -L -O "https://www.wagnardsoft.com/DDU/download/DDU%20v18.0.7.4.exe"
-
-# 3. The payload is a self-extracting 7-Zip archive. Execute it silently (-y answers 'yes' to prompts).
-.\DDU%20v18.0.7.4.exe -y
+### Step 2: The Purge
+Once logged into Safe Mode, run the second script. It will silently wipe the corrupted Intel and NVIDIA drivers and reboot back to normal Windows.
+```powershell
+Set-ExecutionPolicy Bypass -Scope Process -Force
+.\02-Purge-Drivers.ps1
 ```
-<br>
 
-2. Disconnect from the internetand boot to Safe Mode so Windows Update doesn't immediately try to download generic drivers.
-> [!IMPORTANT]
-> Once your laptop boots up in Safe Mode, the graphics will look sharper. That is normal.
-
+### Step 3: Deploy & Reconnect
+Once back in standard Windows, run the final script to restore your internet connection and pull down the clean DisplayLink drivers. 
+```powershell
+Set-ExecutionPolicy Bypass -Scope Process -Force
+.\03-Deploy-DisplayLink.ps1
 ```
-# Disables Wi-Fi to stop Windows Update from downloading generic drivers
-Disable-NetAdapter -Name "*" -Confirm:$false
 
-# Forces the next restart into Safe Mode
-bcdedit /set "{current}" safeboot minimal
-
-# Restarts the laptop immediately
-Restart-Computer
-```
-<br>
-
-3. Wipe NVIDIA, then Intel GPU drivers, and automatically restart your laptop back into normal Windows.
-```
-# Navigate to the DDU folder you created
-cd "C:\DDU"
-
-# Silently wipe the GTX 1650 Max-Q driver without restarting
-.\Display Driver Uninstaller.exe -silent -nvidiaspecific -cleannorestart
-
-# Remove the Safe Mode flag so the laptop boots normally next time
-bcdedit /deletevalue "{current}" safeboot
-
-# Silently wipe the Intel UHD driver and automatically restart
-.\Display Driver Uninstaller.exe -silent -intelspecific -cleanrestart
-```
-<br>
-
-5. Reconnect & reinstall:
-```
-# Turn the Wi-Fi back on
-Enable-NetAdapter -Name "*" -Confirm:$false
-
-# Automatically download and install the Intel UHD Graphics Driver
-winget install -e --id Intel.GraphicsDriver --accept-package-agreements --accept-source-agreements
-
-# Automatically download and install the NVIDIA GeForce Driver
-winget install -e --id Nvidia.GeForceGameReadyDriver --accept-package-agreements --accept-source-agreements
-```
-<br>
-
-### Step #2: Bandwidth Limit and Chroma Subsampling Calibration
+*Once Step 3 completes, plug the DisplayLink adapter back into the laptop.*
