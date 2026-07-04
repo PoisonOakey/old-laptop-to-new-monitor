@@ -32,6 +32,7 @@ try {
 
     Write-Information "[!] Remediation pipeline complete. Plug in the DisplayLink adapter."
 }
+# 3. The "Catch" Block: If ANYTHING fails above, execution instantly jumps here
 catch {
     Write-Information "`n[X] CRITICAL PIPELINE FAILURE"
     Write-Information "Error Details: $($_.Exception.Message)"
