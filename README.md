@@ -17,7 +17,8 @@ The MSI GF63 Thin's USB-C port is data-only. It lacks physical video traces to t
 
 To drive a 4K monitor, a DisplayLink adapter is required to bypass the motherboard and route compressed video data over standard USB protocols. When legacy display drivers corrupt this USB pipeline, it causes severe macroblocking and pixelation. This suite automates the deep-level OS remediation required to restore a clean 5Gbps video stream.
 
-<img width="1024" height="559" alt="articwimds" src="https://github.com/user-attachments/assets/9c9ac79a-bd06-4c0c-b5b7-d0559b40d526" />
+<img width="1024" height="559" alt="articwimds" src="https://github.com/user-attachments/assets/34bf3727-9313-45cb-8734-f1db923f9dca" />
+
 
 ## ⚙️ Pipeline Architecture
 A true graphics driver purge requires isolating the OS and altering boot states. To contain the blast radius across system restarts, the execution is segregated into three distinct phases:
