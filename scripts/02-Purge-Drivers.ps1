@@ -6,6 +6,7 @@
     Includes automated transcript logging and a fail-safe to prevent Safe Mode boot loops.
 #>
 
+# 1. Force all silent errors to instantly trigger the Catch block
 $ErrorActionPreference = 'Stop'
 
 $DDUFolder = "C:\DDU"
