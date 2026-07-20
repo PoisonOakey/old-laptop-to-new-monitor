@@ -2,10 +2,14 @@
 
 A modular PowerShell automation suite designed to resolve degraded video output, pixelation, and bandwidth throttling when bypassing physical GPU bottlenecks via DisplayLink hardware.
 
+---
+
 ## 🌱 The Hardware Bottleneck
 * **Laptop:** MSI GF63C Thin (Intel Core i5, NVIDIA GTX 1650 Max-Q)
 * **Monitor:** Xiaomi 4K 60Hz Monitor A27Ui
 * **Adapter:** Vention USB to Dual HDMI MST Adapter (DisplayLink)
+
+---
 
 ## 💦 Problem Statement
 The MSI GF63 Thin's USB-C port is data-only. It lacks physical video traces to the GPU:
@@ -19,6 +23,7 @@ To drive a 4K monitor, a DisplayLink adapter is required to bypass the motherboa
 
 <img width="1024" height="559" alt="articwimds" src="https://github.com/user-attachments/assets/34bf3727-9313-45cb-8734-f1db923f9dca" />
 
+---
 
 ## ⚙️ Pipeline Architecture
 A true graphics driver purge requires isolating the OS and altering boot states. To contain the blast radius across system restarts, the execution is segregated into three distinct phases:
@@ -29,6 +34,8 @@ A true graphics driver purge requires isolating the OS and altering boot states.
 ├── 📄 02-Purge-Drivers.ps1         # Silently executes DDU dual-GPU wipe
 └── 📄 03-Deploy-DisplayLink.ps1    # Restores network & installs clean DisplayLink UI/Drivers
 ```
+
+---
 
 ## 🚀 Execution Instructions
 
@@ -41,12 +48,14 @@ Set-ExecutionPolicy Bypass -Scope Process -Force
 .\01-Isolate-And-BootSafe.ps1
 ```
 
+
 ### Step 2: The Purge
 *(Run after logging into Safe Mode)*. Silently wipes corrupted Intel/NVIDIA drivers and reboots back to standard Windows.
 ```powershell
 Set-ExecutionPolicy Bypass -Scope Process -Force
 .\02-Purge-Drivers.ps1
 ```
+
 
 ### Step 3: Deploy & Reconnect
 *(Run after returning to normal Windows)*. Restores internet connectivity and pulls clean DisplayLink drivers via Winget.
@@ -56,6 +65,8 @@ Set-ExecutionPolicy Bypass -Scope Process -Force
 ```
 
 *Once Step 3 completes, plug the DisplayLink adapter back into the laptop.*
+
+---
 
 ## :date: Future Improvements
 
@@ -72,3 +83,6 @@ Set-ExecutionPolicy Bypass -Scope Process -Force
 - **Improve logging granularity**: Transcript logging captures console output but doesn't log structured data (timestamps per action, exit codes from DDU, adapter names that were disabled). Switching to or supplementing with structured logging would make post-mortem debugging much easier.
 
 - **Handle DDU exit codes**: The DDU silent-mode invocations in Phase 2 don't check `$LASTEXITCODE`. If DDU fails silently, the pipeline continues as if the purge succeeded. The script should validate the exit code and abort or warn accordingly.
+
+---
+
