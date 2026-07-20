@@ -5,9 +5,9 @@
 ---
 
 ## 🌱 The Hardware Bottleneck
-* **Laptop:** MSI GF63C Thin (Intel Core i5, NVIDIA GTX 1650 Max-Q)
-* **Monitor:** Xiaomi 4K 60Hz Monitor A27Ui
-* **Adapter:** Vention USB to Dual HDMI MST Adapter (DisplayLink)
+* **Laptop:** ```MSI GF63C Thin (Intel Core i5, NVIDIA GTX 1650 Max-Q)```
+* **Monitor:** ```Xiaomi 4K 60Hz Monitor A27Ui```
+* **Adapter:** ```Vention USB to Dual HDMI MST Adapter (DisplayLink)```
 
 ---
 
