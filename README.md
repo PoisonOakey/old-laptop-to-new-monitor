@@ -72,7 +72,3 @@ Set-ExecutionPolicy Bypass -Scope Process -Force
 - **Improve logging granularity**: Transcript logging captures console output but doesn't log structured data (timestamps per action, exit codes from DDU, adapter names that were disabled). Switching to or supplementing with structured logging would make post-mortem debugging much easier.
 
 - **Handle DDU exit codes**: The DDU silent-mode invocations in Phase 2 don't check `$LASTEXITCODE`. If DDU fails silently, the pipeline continues as if the purge succeeded. The script should validate the exit code and abort or warn accordingly.
-
-## License
-
-[MIT](LICENSE)
