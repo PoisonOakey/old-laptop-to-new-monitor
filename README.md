@@ -4,14 +4,14 @@
 
 ---
 
-## 🌱 The Hardware Bottleneck
+## :computer: The Hardware Bottleneck
 * **Laptop:** ```MSI GF63C Thin (Intel Core i5, NVIDIA GTX 1650 Max-Q)```
 * **Monitor:** ```Xiaomi 4K 60Hz Monitor A27Ui```
 * **Adapter:** ```Vention USB to Dual HDMI MST Adapter (DisplayLink)```
 
 ---
 
-## 💦 Problem Statement
+## :anger: Problem Statement
 The MSI GF63 Thin's USB-C port is data-only. It lacks physical video traces to the GPU:
 
 ```text
