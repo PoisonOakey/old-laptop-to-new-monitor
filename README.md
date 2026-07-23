@@ -70,19 +70,14 @@ Set-ExecutionPolicy Bypass -Scope Process -Force
 
 ## :date: Future Improvements
 
-- **Remove force / brute-force commands**: The pipeline currently uses `bcdedit` to force Safe Mode and `Disable-NetAdapter -Physical` to blanket-kill all adapters. These are aggressive, system-wide operations with no user confirmation gate. A future version should prompt for confirmation (or at least support a `-WhatIf` dry-run flag) so the scripts can be audited before they touch boot config or network state.
-
-- **Parameterise hardcoded paths and URLs**: `C:\DDU`, the DDU download URL, and the DDU version string (`v18.0.7.4`) are all hardcoded. These should be pulled into script parameters (or a shared config file) so the pipeline is portable and version-bumps don't require editing script internals.
-
-- **Validate downloads before execution**: Phase 1 downloads an `.exe` from the internet and immediately runs it with no hash or signature check. Adding a checksum verification step would prevent executing a corrupted or tampered binary.
-
-- **Consolidate duplicated boilerplate**: The admin check, `$ErrorActionPreference`, transcript setup, and try/catch/finally structure are copy-pasted across all three scripts. Extracting these into a shared helper module (e.g. `_Common.psm1`) would reduce maintenance surface and keep behaviour consistent.
-
-- **Add `-WhatIf` / dry-run support**: None of the scripts support `SupportsShouldProcess`. Adding `[CmdletBinding(SupportsShouldProcess)]` would let users preview destructive actions (`Restart-Computer`, `Disable-NetAdapter`, `bcdedit`) without actually executing them.
-
-- **Improve logging granularity**: Transcript logging captures console output but doesn't log structured data (timestamps per action, exit codes from DDU, adapter names that were disabled). Switching to or supplementing with structured logging would make post-mortem debugging much easier.
-
-- **Handle DDU exit codes**: The DDU silent-mode invocations in Phase 2 don't check `$LASTEXITCODE`. If DDU fails silently, the pipeline continues as if the purge succeeded. The script should validate the exit code and abort or warn accordingly.
+| Area | Planned Enhancement |
+| :--- | :--- |
+| **Safety** | Add `-WhatIf` support and prompt for aggressive system-wide commands (`bcdedit`, network changes). |
+| **Config** | Extract hardcoded paths and URLs (e.g., DDU versions) into parameters or a shared config. |
+| **Security** | Validate hashes/signatures of downloaded binaries before execution. |
+| **Refactor** | Consolidate duplicated boilerplate (admin checks, try/catch) into a `_Common.psm1` module. |
+| **Logging** | Implement structured logging for better post-mortem debugging. |
+| **Resilience**| Validate DDU `$LASTEXITCODE` to catch and handle silent failures. |
 
 ---
 
