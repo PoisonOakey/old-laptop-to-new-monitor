@@ -41,8 +41,11 @@ A three-stage PowerShell pipeline that orchestrates deep-level OS remediation ac
 
 ```text
 📁 scripts/
+|
 ├── 📄 01-Isolate-And-BootSafe.ps1  # Prepares environment, isolates network, forces Safe Mode
+|
 ├── 📄 02-Purge-Drivers.ps1         # Silently executes DDU dual-GPU wipe
+|
 └── 📄 03-Deploy-DisplayLink.ps1    # Restores network & installs clean DisplayLink UI/Drivers
 ```
 
