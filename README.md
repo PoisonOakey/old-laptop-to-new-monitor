@@ -1,83 +1,82 @@
-# DisplayLink Automated Remediation Pipeline
+# DisplayLink Remediation Automation
 
->A modular PowerShell automation suite designed to resolve degraded video output, pixelation, and bandwidth throttling when bypassing physical GPU bottlenecks via DisplayLink hardware.
-
----
-
-## :computer: The Hardware Bottleneck
-* **Laptop:** ```MSI GF63C Thin (Intel Core i5, NVIDIA GTX 1650 Max-Q)```
-* **Monitor:** ```Xiaomi 4K 60Hz Monitor A27Ui```
-* **Adapter:** ```Vention USB to Dual HDMI MST Adapter (DisplayLink)```
+> An OS-level automation suite to resolve degraded video output, pixelation, and bandwidth throttling when bypassing physical GPU bottlenecks via DisplayLink hardware.
 
 ---
 
-## :anger: Problem Statement
-The MSI GF63 Thin's USB-C port is data-only. It lacks physical video traces to the GPU:
+## 🚀 What I Built
+
+A three-stage PowerShell pipeline that orchestrates deep-level OS remediation across boot cycles. It forces the system into Safe Mode, silently purges corrupted graphics drivers, and automatically redeploys a clean 5Gbps USB video stream.
+
+---
+
+## 🛑 The Problem
+
+- **Missing physical traces:** The host laptop (MSI GF63) features a data-only USB-C port, completely lacking hardware video traces to the internal NVIDIA GPU.
+- **Protocol bottleneck:** Driving a 4K monitor requires a DisplayLink adapter to route compressed video data over standard USB protocols.
+- **Driver corruption:** Legacy display drivers frequently corrupt this USB pipeline, resulting in severe macroblocking, pixelation, and unusable video output.
 
 ```text
 [Intel iGPU] ──(Direct Traces)──> [HDMI 1.4 Port] ──> [Monitor]
 [Intel iGPU] ──(Direct Traces)──> [USB-C Port] ✖ [Signal Terminated]
 ```
 
-To drive a 4K monitor, a DisplayLink adapter is required to bypass the motherboard and route compressed video data over standard USB protocols. When legacy display drivers corrupt this USB pipeline, it causes severe macroblocking and pixelation. This suite automates the deep-level OS remediation required to restore a clean 5Gbps video stream.
 
 <img width="1024" height="559" alt="articwimds" src="https://github.com/user-attachments/assets/34bf3727-9313-45cb-8734-f1db923f9dca" />
 
 ---
 
+## 🧠 Key Engineering Decisions
+
+| Area | Detail |
+|---|---|
+| **State Segregation** | Execution is strictly segregated into three distinct phases across boot cycles to contain the blast radius of driver manipulation. |
+| **Boot-State Manipulation** | Programmatically alters `bcdedit` boot configurations to force Windows into Safe Mode for deep-level driver uninstallation. |
+| **Network Isolation** | Preemptively disables physical network adapters during the purge phase to prevent Windows Update from hijacking the driver installation process. |
+| **Silent Execution** | Wraps Display Driver Uninstaller (DDU) and Winget deployments in silent flags for a zero-touch remediation experience. |
+
+---
+
 ## ⚙️ Pipeline Architecture
-A true graphics driver purge requires isolating the OS and altering boot states. To contain the blast radius across system restarts, the execution is segregated into three distinct phases:
 
 ```text
 📁 scripts/
-├── 📄 01-Isolate-And-BootSafe.ps1  # Prepares environment & forces Safe Mode
+├── 📄 01-Isolate-And-BootSafe.ps1  # Prepares environment, isolates network, forces Safe Mode
 ├── 📄 02-Purge-Drivers.ps1         # Silently executes DDU dual-GPU wipe
 └── 📄 03-Deploy-DisplayLink.ps1    # Restores network & installs clean DisplayLink UI/Drivers
 ```
 
 ---
 
-## 🚀 Execution Instructions
+## ⚡ Execution
 
-**Prerequisites:** Disconnect your DisplayLink adapter before beginning. Ensure you are running an elevated PowerShell terminal (`Run as Administrator`).
+**Prerequisites:** Disconnect the DisplayLink adapter. Open an elevated PowerShell terminal.
 
-### Step 1: Isolate & Reboot
-Downloads uninstaller payloads, disables physical network adapters to block Windows Update hijacking, and automatically reboots into Safe Mode.
+### Stage 1: Isolate & Reboot
+Disables network adapters and reboots into Safe Mode.
 ```powershell
 Set-ExecutionPolicy Bypass -Scope Process -Force
 .\01-Isolate-And-BootSafe.ps1
 ```
 
-
-### Step 2: The Purge
-*(Run after logging into Safe Mode)*. Silently wipes corrupted Intel/NVIDIA drivers and reboots back to standard Windows.
+### Stage 2: The Purge
+*(Run after logging into Safe Mode)*. Silently wipes corrupted drivers and reboots normally.
 ```powershell
 Set-ExecutionPolicy Bypass -Scope Process -Force
 .\02-Purge-Drivers.ps1
 ```
 
-
-### Step 3: Deploy & Reconnect
-*(Run after returning to normal Windows)*. Restores internet connectivity and pulls clean DisplayLink drivers via Winget.
+### Stage 3: Deploy & Reconnect
+*(Run in normal Windows)*. Restores networking and installs clean drivers. Reconnect adapter after completion.
 ```powershell
 Set-ExecutionPolicy Bypass -Scope Process -Force
 .\03-Deploy-DisplayLink.ps1
 ```
 
-*Once Step 3 completes, plug the DisplayLink adapter back into the laptop.*
-
 ---
 
-## :date: Future Improvements
-
-| Area | Planned Enhancement |
-| :--- | :--- |
-| **Safety** | Add `-WhatIf` support and prompt for aggressive system-wide commands (`bcdedit`, network changes). |
-| **Config** | Extract hardcoded paths and URLs (e.g., DDU versions) into parameters or a shared config. |
-| **Security** | Validate hashes/signatures of downloaded binaries before execution. |
-| **Refactor** | Consolidate duplicated boilerplate (admin checks, try/catch) into a `_Common.psm1` module. |
-| **Logging** | Implement structured logging for better post-mortem debugging. |
-| **Resilience**| Validate DDU `$LASTEXITCODE` to catch and handle silent failures. |
-
----
-
+> [!NOTE]
+> ### 🔮 Future Roadmap
+> - **Centralized Config** — extract hardcoded URLs and version paths into a shared configuration file
+> - **Security Validation** — enforce hash/signature validation on downloaded binaries before execution
+> - **Idempotent Resilience** — validate exit codes and handle silent DDU failures to prevent pipeline lockups
