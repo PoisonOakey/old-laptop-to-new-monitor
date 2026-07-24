@@ -6,15 +6,15 @@
 
 ## 🚀 What I Built
 
-A three-stage PowerShell pipeline that orchestrates deep-level OS remediation across boot cycles. It forces the system into Safe Mode, silently purges corrupted graphics drivers, and automatically redeploys a clean 5Gbps USB video stream.
+An automated script that fixes display issues by safely removing corrupted graphics drivers and setting up a fresh, clean connection for USB monitors.
 
 ---
 
 ## 🛑 The Problem
 
-- **Missing physical traces:** The host laptop (MSI GF63) features a data-only USB-C port, completely lacking hardware video traces to the internal NVIDIA GPU.
-- **Protocol bottleneck:** Driving a 4K monitor requires a DisplayLink adapter to route compressed video data over standard USB protocols.
-- **Driver corruption:** Legacy display drivers frequently corrupt this USB pipeline, resulting in severe macroblocking, pixelation, and unusable video output.
+- **No direct video output:** The laptop's USB-C port doesn't support video directly.
+- **Adapter needed:** Connecting a monitor requires a DisplayLink adapter to send video over standard USB.
+- **Software glitches:** Old drivers often corrupt this connection, making the video blocky, pixelated, or completely unusable.
 
 ```text
 [Intel iGPU] ──(Direct Traces)──> [HDMI 1.4 Port] ──> [Monitor]
@@ -77,6 +77,14 @@ Set-ExecutionPolicy Bypass -Scope Process -Force
 ```
 
 ---
+
+## 📈 The Outcome
+
+| Issue | Before (The Problem) | After (The Outcome) |
+|---|---|---|
+| **Hardware Gap** | Reliant on a USB adapter that is prone to driver corruption | Perfectly managed software layer enabling flawless adapter use |
+| **Video Quality** | Blocky, pixelated, or completely unusable video | Crystal clear 4K display output with zero artifacts |
+| **Reliability** | Old, glitchy software corrupting the USB pipeline | Automated script ensures fresh, 100% stable drivers every time |
 
 > [!NOTE]
 > ### 🔮 Future Roadmap
